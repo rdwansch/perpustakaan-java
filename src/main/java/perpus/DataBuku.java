@@ -20,7 +20,7 @@ public class DataBuku extends javax.swing.JFrame {
     DefaultTableModel defaultTableModel;
 
     public void initData() {
-        // get data
+        // fetch data
         ResultSet data = this.bukuModel.findAll();
         defaultTableModel = (DefaultTableModel) tabelBuku.getModel();
 
@@ -233,7 +233,7 @@ public class DataBuku extends javax.swing.JFrame {
         jLabel11.setText("Data Buku");
 
         cmbSearchBuku.setFont(new java.awt.Font("Cantarell", 0, 20)); // NOI18N
-        cmbSearchBuku.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "kategori", "penulis", "penerbit", "status" }));
+        cmbSearchBuku.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "kategori", "judul", "penerbit", "status" }));
         cmbSearchBuku.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cmbSearchBukuActionPerformed(evt);
@@ -457,23 +457,30 @@ public class DataBuku extends javax.swing.JFrame {
     private void searchBukuKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_searchBukuKeyTyped
         // TODO add your handling code here:
     }//GEN-LAST:event_searchBukuKeyTyped
-
     private void searchBukuKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_searchBukuKeyReleased
         try {
+            // remove all row for replacing new Data
+            if (defaultTableModel.getRowCount() != 0) {
+                System.out.println("Delete pls");
+                defaultTableModel.setRowCount(0);
+            }
+
+            // check if input is empty
+            if (searchBuku.getText().equals("")) {
+
+                initData();
+                return;
+            }
+
             // get value from comboBox
             String selectedValue = cmbSearchBuku.getSelectedItem().toString();
-            // search and get data
+            // search and fetch data
             ResultSet data = this.bukuModel.searchBy(selectedValue, searchBuku.getText());
             searchAlert.setText("");
 
             // if data doesn't exist
             if (!data.isBeforeFirst()) {
                 searchAlert.setText("Data tidak ada!");
-            }
-
-            // remove all row
-            if (defaultTableModel.getRowCount() != 0) {
-                defaultTableModel.removeRow(0);
             }
 
             // inject row with data

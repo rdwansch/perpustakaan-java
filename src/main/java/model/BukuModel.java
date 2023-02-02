@@ -31,10 +31,13 @@ public class BukuModel extends Model {
 
     public ResultSet searchBy(String field, String value) {
         try {
+            // query SQL
             String query = "SELECT * FROM " + this.TABLE + " WHERE " + field + " LIKE ?";
 
+            // prepare statement
             PreparedStatement stmt = this.conn.prepareStatement(query);
 
+            // replace ? with value
             stmt.setString(1, "%" + value + "%");
 
             return stmt.executeQuery();
