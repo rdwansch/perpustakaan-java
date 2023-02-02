@@ -19,14 +19,66 @@ public class DataBuku extends javax.swing.JFrame {
     final BukuModel bukuModel = new BukuModel();
     DefaultTableModel defaultTableModel;
 
-    public void initData() {
+    private void initData() {
+        searchAlert.setText("");
+
         // fetch data
         ResultSet data = this.bukuModel.findAll();
         defaultTableModel = (DefaultTableModel) tabelBuku.getModel();
 
         // inject row
         this.bukuModel.injectRow(defaultTableModel, data);
+    }
 
+    private void searchTableAction() {
+        try {
+            // remove all row for replacing new Data
+            if (defaultTableModel.getRowCount() != 0) {
+                defaultTableModel.setRowCount(0);
+            }
+
+            searchAlert.setText("");
+
+            // check if input is empty
+            if (searchBuku.getText().equals("")) {
+                initData();
+                return;
+            }
+
+            // get value from comboBox
+            String selectedValue = cmbSearchBuku.getSelectedItem().toString();
+            // search and fetch data
+            ResultSet data = this.bukuModel.searchBy(selectedValue, searchBuku.getText());
+
+            // if data doesn't exist
+            if (!data.isBeforeFirst()) {
+                searchAlert.setText("Data tidak ada!");
+                return;
+            }
+
+            // inject row with new data
+            this.bukuModel.injectRow(defaultTableModel, data);
+
+        } catch (SQLException ex) {
+            Logger.getLogger(DataBuku.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void initLayout() {
+        // hide button
+        btnSimpan.setVisible(false);
+        btnUbah.setVisible(false);
+        btnHapus.setVisible(false);
+
+        // adjust table size
+        tabelBuku.setRowHeight(25);
+        tabelBuku.getColumnModel().getColumn(0).setPreferredWidth(130);
+        tabelBuku.getColumnModel().getColumn(1).setPreferredWidth(230);
+        tabelBuku.getColumnModel().getColumn(2).setPreferredWidth(1);
+        tabelBuku.getColumnModel().getColumn(3).setPreferredWidth(100);
+        tabelBuku.getColumnModel().getColumn(4).setPreferredWidth(1);
+        tabelBuku.getColumnModel().getColumn(5).setPreferredWidth(40);
+        tabelBuku.getColumnModel().getColumn(6).setPreferredWidth(40);
     }
 
     /**
@@ -35,9 +87,7 @@ public class DataBuku extends javax.swing.JFrame {
     public DataBuku() {
         initComponents();
         initData();
-        btnSimpan.setVisible(false);
-        btnUbah.setVisible(false);
-        btnHapus.setVisible(false);
+        initLayout();
     }
 
     /**
@@ -451,45 +501,14 @@ public class DataBuku extends javax.swing.JFrame {
     }//GEN-LAST:event_statusBukuActionPerformed
 
     private void cmbSearchBukuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbSearchBukuActionPerformed
-        // TODO add your handling code here:
+        this.searchTableAction();
     }//GEN-LAST:event_cmbSearchBukuActionPerformed
 
     private void searchBukuKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_searchBukuKeyTyped
         // TODO add your handling code here:
     }//GEN-LAST:event_searchBukuKeyTyped
     private void searchBukuKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_searchBukuKeyReleased
-        try {
-            // remove all row for replacing new Data
-            if (defaultTableModel.getRowCount() != 0) {
-                System.out.println("Delete pls");
-                defaultTableModel.setRowCount(0);
-            }
-
-            // check if input is empty
-            if (searchBuku.getText().equals("")) {
-
-                initData();
-                return;
-            }
-
-            // get value from comboBox
-            String selectedValue = cmbSearchBuku.getSelectedItem().toString();
-            // search and fetch data
-            ResultSet data = this.bukuModel.searchBy(selectedValue, searchBuku.getText());
-            searchAlert.setText("");
-
-            // if data doesn't exist
-            if (!data.isBeforeFirst()) {
-                searchAlert.setText("Data tidak ada!");
-            }
-
-            // inject row with data
-            this.bukuModel.injectRow(defaultTableModel, data);
-
-        } catch (SQLException ex) {
-            Logger.getLogger(DataBuku.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
+        this.searchTableAction();
     }//GEN-LAST:event_searchBukuKeyReleased
 
     /**

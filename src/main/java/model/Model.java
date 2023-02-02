@@ -38,7 +38,7 @@ public class Model {
     }
 
     public ResultSet findAll() {
-        String query = "SELECT * FROM " + this.TABLE;
+        String query = "SELECT * FROM " + this.TABLE + " ORDER BY id DESC";
 
         try {
             return this.conn.createStatement().executeQuery(query);
