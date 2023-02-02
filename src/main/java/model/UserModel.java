@@ -48,6 +48,7 @@ public class UserModel extends Model {
             return false;
         } catch (SQLException ex) {
             Logger.getLogger(UserModel.class.getName()).log(Level.SEVERE, null, ex);
+
             return false;
         }
     }

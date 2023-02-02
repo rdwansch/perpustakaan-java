@@ -16,31 +16,16 @@ import model.BukuModel;
  */
 public class DataBuku extends javax.swing.JFrame {
 
-    static final String DB_URL = "jdbc:mariadb://localhost:3306/ukk";
-    static final String USER = "root";
-    static final String PASS = "";
+    final BukuModel bukuModel = new BukuModel();
+    DefaultTableModel defaultTableModel;
 
     public void initData() {
-        BukuModel bukuModel = new BukuModel();
-        DefaultTableModel dft = (DefaultTableModel) tabelBuku.getModel();
+        // get data
+        ResultSet data = this.bukuModel.findAll();
+        defaultTableModel = (DefaultTableModel) tabelBuku.getModel();
 
-        ResultSet data = bukuModel.findAll();
-
-        try {
-            while (data.next()) {
-                dft.addRow(new Object[]{
-                    data.getString("kategori"),
-                    data.getString("judul"),
-                    data.getString("tahun"),
-                    data.getString("penerbit"),
-                    data.getString("jumlah"),
-                    data.getString("status"),
-                    data.getString("kode")
-                });
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(DataBuku.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        // inject row
+        this.bukuModel.injectRow(defaultTableModel, data);
 
     }
 
@@ -88,10 +73,11 @@ public class DataBuku extends javax.swing.JFrame {
         jSeparator1 = new javax.swing.JSeparator();
         jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
-        jComboBox2 = new javax.swing.JComboBox<>();
-        jTextField8 = new javax.swing.JTextField();
+        cmbSearchBuku = new javax.swing.JComboBox<>();
+        searchBuku = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabelBuku = new javax.swing.JTable();
+        searchAlert = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -246,14 +232,27 @@ public class DataBuku extends javax.swing.JFrame {
         jLabel11.setFont(new java.awt.Font("Cantarell", 1, 30)); // NOI18N
         jLabel11.setText("Data Buku");
 
-        jComboBox2.setFont(new java.awt.Font("Cantarell", 0, 20)); // NOI18N
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "kategori", "penulis", "judul" }));
-
-        jTextField8.setFont(new java.awt.Font("Cantarell", 0, 20)); // NOI18N
-        jTextField8.setMargin(new java.awt.Insets(2, 15, 2, 15));
-        jTextField8.addActionListener(new java.awt.event.ActionListener() {
+        cmbSearchBuku.setFont(new java.awt.Font("Cantarell", 0, 20)); // NOI18N
+        cmbSearchBuku.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "kategori", "penulis", "penerbit", "status" }));
+        cmbSearchBuku.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField8ActionPerformed(evt);
+                cmbSearchBukuActionPerformed(evt);
+            }
+        });
+
+        searchBuku.setFont(new java.awt.Font("Cantarell", 0, 20)); // NOI18N
+        searchBuku.setMargin(new java.awt.Insets(2, 15, 2, 15));
+        searchBuku.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                searchBukuActionPerformed(evt);
+            }
+        });
+        searchBuku.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                searchBukuKeyReleased(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                searchBukuKeyTyped(evt);
             }
         });
 
@@ -276,6 +275,9 @@ public class DataBuku extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(tabelBuku);
 
+        searchAlert.setFont(new java.awt.Font("Cantarell", 0, 25)); // NOI18N
+        searchAlert.setForeground(new java.awt.Color(255, 0, 0));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -284,12 +286,19 @@ public class DataBuku extends javax.swing.JFrame {
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(27, 27, 27)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane1)
+                        .addContainerGap())
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel10)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(searchAlert))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(cmbSearchBuku, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
-                                .addComponent(jTextField8))
+                                .addComponent(searchBuku))
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                 .addComponent(btnTambah, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(91, 91, 91)
@@ -326,13 +335,7 @@ public class DataBuku extends javax.swing.JFrame {
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(statusBuku, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 314, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(kodeBuku, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 314, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addGap(62, 62, 62))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel10)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1)
-                        .addContainerGap())))
+                        .addGap(62, 62, 62))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -380,11 +383,13 @@ public class DataBuku extends javax.swing.JFrame {
                 .addGap(41, 41, 41)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel10)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel10)
+                    .addComponent(searchAlert))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField8, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cmbSearchBuku, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(searchBuku, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 308, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(326, 326, 326))
@@ -419,20 +424,6 @@ public class DataBuku extends javax.swing.JFrame {
 
     private void btnTambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTambahActionPerformed
         // TODO add your handling code here:
-
-        try ( Connection conn = DriverManager.getConnection(DB_URL, USER, PASS)) {
-            Statement stmt = conn.createStatement();
-
-            String sql = String.format(
-                    "INSERT INTO buku (judul, jumlah, pengarang, penerbit, status, tahun) VALUES(%s, %d, $s, %s, %s, %d)",
-                    judul.getText(), tahunBuku.getText(), penerbitBuku.getText(), jumlahBuku.getText(), "Tersedia", 2014
-            );
-
-            stmt.executeUpdate(sql);
-
-        } catch (SQLException e) {
-            System.out.print(e);
-        }
     }//GEN-LAST:event_btnTambahActionPerformed
 
     private void btnSimpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSimpanActionPerformed
@@ -451,13 +442,48 @@ public class DataBuku extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_btnKeluarActionPerformed
 
-    private void jTextField8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField8ActionPerformed
+    private void searchBukuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchBukuActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField8ActionPerformed
+    }//GEN-LAST:event_searchBukuActionPerformed
 
     private void statusBukuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statusBukuActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_statusBukuActionPerformed
+
+    private void cmbSearchBukuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbSearchBukuActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cmbSearchBukuActionPerformed
+
+    private void searchBukuKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_searchBukuKeyTyped
+        // TODO add your handling code here:
+    }//GEN-LAST:event_searchBukuKeyTyped
+
+    private void searchBukuKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_searchBukuKeyReleased
+        try {
+            // get value from comboBox
+            String selectedValue = cmbSearchBuku.getSelectedItem().toString();
+            // search and get data
+            ResultSet data = this.bukuModel.searchBy(selectedValue, searchBuku.getText());
+            searchAlert.setText("");
+
+            // if data doesn't exist
+            if (!data.isBeforeFirst()) {
+                searchAlert.setText("Data tidak ada!");
+            }
+
+            // remove all row
+            if (defaultTableModel.getRowCount() != 0) {
+                defaultTableModel.removeRow(0);
+            }
+
+            // inject row with data
+            this.bukuModel.injectRow(defaultTableModel, data);
+
+        } catch (SQLException ex) {
+            Logger.getLogger(DataBuku.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }//GEN-LAST:event_searchBukuKeyReleased
 
     /**
      * @param args the command line arguments
@@ -509,7 +535,7 @@ public class DataBuku extends javax.swing.JFrame {
     private javax.swing.JButton btnSimpan;
     private javax.swing.JButton btnTambah;
     private javax.swing.JButton btnUbah;
-    private javax.swing.JComboBox<String> jComboBox2;
+    private javax.swing.JComboBox<String> cmbSearchBuku;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -523,12 +549,13 @@ public class DataBuku extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JTextField jTextField8;
     private javax.swing.JTextField judul;
     private javax.swing.JTextField jumlahBuku;
     private javax.swing.JTextField kategori;
     private javax.swing.JTextField kodeBuku;
     private javax.swing.JTextField penerbitBuku;
+    private javax.swing.JLabel searchAlert;
+    private javax.swing.JTextField searchBuku;
     private javax.swing.JComboBox<String> statusBuku;
     private javax.swing.JTable tabelBuku;
     private javax.swing.JTextField tahunBuku;
