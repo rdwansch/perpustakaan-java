@@ -9,9 +9,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
@@ -33,7 +30,7 @@ public class Model {
         try {
             this.conn = DriverManager.getConnection(this.DB_URL + "?user=" + this.USER + "&password=" + this.PASS);
         } catch (SQLException e) {
-            System.out.println("Error connect DB -> " + e);
+            System.out.println("<-- Error connect DB -> " + e);
         }
     }
 
@@ -46,6 +43,7 @@ public class Model {
             JOptionPane.showMessageDialog(null, "Error query: " + exception.getMessage());
             return null;
         }
+
     }
 
     public ResultSet findWhere(String field, String value) throws SQLException {

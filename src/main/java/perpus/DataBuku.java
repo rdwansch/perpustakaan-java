@@ -7,6 +7,7 @@ package perpus;
 import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import model.BukuModel;
 
@@ -79,6 +80,7 @@ public class DataBuku extends javax.swing.JFrame {
         tabelBuku.getColumnModel().getColumn(4).setPreferredWidth(1);
         tabelBuku.getColumnModel().getColumn(5).setPreferredWidth(40);
         tabelBuku.getColumnModel().getColumn(6).setPreferredWidth(40);
+
     }
 
     /**
@@ -88,6 +90,9 @@ public class DataBuku extends javax.swing.JFrame {
         initComponents();
         initData();
         initLayout();
+
+        System.out.printf("Before -> %s, %s, %d, %s", this.bukuModel.kategori, this.bukuModel.judul, this.bukuModel.tahun, this.bukuModel.penerbit);
+
     }
 
     /**
@@ -102,12 +107,12 @@ public class DataBuku extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        judul = new javax.swing.JTextField();
+        judulBuku = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
-        kategori = new javax.swing.JTextField();
+        kategoriBuku = new javax.swing.JTextField();
         penerbitBuku = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
-        tahunBuku = new javax.swing.JTextField();
+        tahunBuku = new javax.swing.JTextField(8);
         jLabel5 = new javax.swing.JLabel();
         jumlahBuku = new javax.swing.JTextField();
         kodeBuku = new javax.swing.JTextField();
@@ -128,6 +133,7 @@ public class DataBuku extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         tabelBuku = new javax.swing.JTable();
         searchAlert = new javax.swing.JLabel();
+        DataBukuAlert = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -157,22 +163,22 @@ public class DataBuku extends javax.swing.JFrame {
         jLabel2.setFont(new java.awt.Font("Cantarell", 0, 20)); // NOI18N
         jLabel2.setText("Kategori");
 
-        judul.setFont(new java.awt.Font("Cantarell", 0, 20)); // NOI18N
-        judul.setMargin(new java.awt.Insets(2, 15, 2, 15));
-        judul.addActionListener(new java.awt.event.ActionListener() {
+        judulBuku.setFont(new java.awt.Font("Cantarell", 0, 20)); // NOI18N
+        judulBuku.setMargin(new java.awt.Insets(2, 15, 2, 15));
+        judulBuku.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                judulActionPerformed(evt);
+                judulBukuActionPerformed(evt);
             }
         });
 
         jLabel3.setFont(new java.awt.Font("Cantarell", 0, 20)); // NOI18N
         jLabel3.setText("Judul");
 
-        kategori.setFont(new java.awt.Font("Cantarell", 0, 20)); // NOI18N
-        kategori.setMargin(new java.awt.Insets(2, 15, 2, 15));
-        kategori.addActionListener(new java.awt.event.ActionListener() {
+        kategoriBuku.setFont(new java.awt.Font("Cantarell", 0, 20)); // NOI18N
+        kategoriBuku.setMargin(new java.awt.Insets(2, 15, 2, 15));
+        kategoriBuku.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                kategoriActionPerformed(evt);
+                kategoriBukuActionPerformed(evt);
             }
         });
 
@@ -194,6 +200,11 @@ public class DataBuku extends javax.swing.JFrame {
                 tahunBukuActionPerformed(evt);
             }
         });
+        tahunBuku.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                tahunBukuKeyTyped(evt);
+            }
+        });
 
         jLabel5.setFont(new java.awt.Font("Cantarell", 0, 20)); // NOI18N
         jLabel5.setText("Tahun");
@@ -205,12 +216,22 @@ public class DataBuku extends javax.swing.JFrame {
                 jumlahBukuActionPerformed(evt);
             }
         });
+        jumlahBuku.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jumlahBukuKeyTyped(evt);
+            }
+        });
 
         kodeBuku.setFont(new java.awt.Font("Cantarell", 0, 20)); // NOI18N
         kodeBuku.setMargin(new java.awt.Insets(2, 15, 2, 15));
         kodeBuku.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 kodeBukuActionPerformed(evt);
+            }
+        });
+        kodeBuku.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                kodeBukuKeyTyped(evt);
             }
         });
 
@@ -328,6 +349,8 @@ public class DataBuku extends javax.swing.JFrame {
         searchAlert.setFont(new java.awt.Font("Cantarell", 0, 25)); // NOI18N
         searchAlert.setForeground(new java.awt.Color(255, 0, 0));
 
+        DataBukuAlert.setForeground(new java.awt.Color(255, 0, 0));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -350,12 +373,17 @@ public class DataBuku extends javax.swing.JFrame {
                                 .addGap(18, 18, 18)
                                 .addComponent(searchBuku))
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                .addComponent(btnTambah, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(91, 91, 91)
-                                .addComponent(btnSimpan, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 77, Short.MAX_VALUE)
-                                .addComponent(btnUbah, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 121, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(btnTambah, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(91, 91, 91)
+                                        .addComponent(btnSimpan, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 77, Short.MAX_VALUE)
+                                        .addComponent(btnUbah, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 121, Short.MAX_VALUE))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(DataBukuAlert)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(layout.createSequentialGroup()
                                         .addComponent(btnHapus, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -372,8 +400,8 @@ public class DataBuku extends javax.swing.JFrame {
                                     .addComponent(jLabel5))
                                 .addGap(27, 27, 27)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(kategori)
-                                    .addComponent(judul)
+                                    .addComponent(kategoriBuku)
+                                    .addComponent(judulBuku)
                                     .addComponent(tahunBuku)
                                     .addComponent(penerbitBuku, javax.swing.GroupLayout.PREFERRED_SIZE, 308, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(41, 41, 41)
@@ -391,9 +419,15 @@ public class DataBuku extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
-                .addGap(41, 41, 41)
-                .addComponent(jLabel11)
-                .addGap(38, 38, 38)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(41, 41, 41)
+                        .addComponent(jLabel11)
+                        .addGap(38, 38, 38))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(DataBukuAlert)
+                        .addGap(18, 18, 18)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jumlahBuku, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -409,11 +443,11 @@ public class DataBuku extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel2)
-                            .addComponent(kategori, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(kategoriBuku, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel9))
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(judul, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(judulBuku, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel3))
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -448,13 +482,13 @@ public class DataBuku extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void judulActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_judulActionPerformed
+    private void judulBukuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_judulBukuActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_judulActionPerformed
+    }//GEN-LAST:event_judulBukuActionPerformed
 
-    private void kategoriActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_kategoriActionPerformed
+    private void kategoriBukuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_kategoriBukuActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_kategoriActionPerformed
+    }//GEN-LAST:event_kategoriBukuActionPerformed
 
     private void penerbitBukuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_penerbitBukuActionPerformed
         // TODO add your handling code here:
@@ -473,7 +507,29 @@ public class DataBuku extends javax.swing.JFrame {
     }//GEN-LAST:event_kodeBukuActionPerformed
 
     private void btnTambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTambahActionPerformed
-        // TODO add your handling code here:
+
+        if (kategoriBuku.get) {
+        }
+
+        // grab all input user
+        this.bukuModel.kategori = kategoriBuku.getText();
+        this.bukuModel.judul = judulBuku.getText();
+        this.bukuModel.tahun = Integer.parseInt(tahunBuku.getText());
+        this.bukuModel.penerbit = penerbitBuku.getText();
+        this.bukuModel.jumlah = Integer.parseInt(jumlahBuku.getText());
+        this.bukuModel.status = statusBuku.getSelectedItem().toString();
+        this.bukuModel.kode = kodeBuku.getText();
+
+        boolean isSuccess = this.bukuModel.insertBuku(this.bukuModel);
+
+        if (isSuccess) {
+
+            initData();
+            return;
+        }
+
+        JOptionPane.showMessageDialog(null, "Gagal Tambah Data");
+
     }//GEN-LAST:event_btnTambahActionPerformed
 
     private void btnSimpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSimpanActionPerformed
@@ -510,6 +566,33 @@ public class DataBuku extends javax.swing.JFrame {
     private void searchBukuKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_searchBukuKeyReleased
         this.searchTableAction();
     }//GEN-LAST:event_searchBukuKeyReleased
+
+    private void tahunBukuKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tahunBukuKeyTyped
+        // Limit input user
+
+        boolean max = tahunBuku.getText().length() > 3;
+        if (max) {
+            evt.consume();
+        }
+    }//GEN-LAST:event_tahunBukuKeyTyped
+
+    private void jumlahBukuKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jumlahBukuKeyTyped
+        // Limit input user
+
+        boolean max = jumlahBuku.getText().length() > 3;
+        if (max) {
+            evt.consume();
+        }
+    }//GEN-LAST:event_jumlahBukuKeyTyped
+
+    private void kodeBukuKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_kodeBukuKeyTyped
+        // Limit input user
+
+        boolean max = kodeBuku.getText().length() > 9;
+        if (max) {
+            evt.consume();
+        }
+    }//GEN-LAST:event_kodeBukuKeyTyped
 
     /**
      * @param args the command line arguments
@@ -556,6 +639,7 @@ public class DataBuku extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel DataBukuAlert;
     private javax.swing.JButton btnHapus;
     private javax.swing.JButton btnKeluar;
     private javax.swing.JButton btnSimpan;
@@ -575,9 +659,9 @@ public class DataBuku extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JTextField judul;
+    private javax.swing.JTextField judulBuku;
     private javax.swing.JTextField jumlahBuku;
-    private javax.swing.JTextField kategori;
+    private javax.swing.JTextField kategoriBuku;
     private javax.swing.JTextField kodeBuku;
     private javax.swing.JTextField penerbitBuku;
     private javax.swing.JLabel searchAlert;

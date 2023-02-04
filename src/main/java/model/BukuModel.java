@@ -49,6 +49,34 @@ public class BukuModel extends Model {
         }
     }
 
+    public boolean insertBuku(BukuModel data) {
+        try {
+            // query SQL
+            String query = "INSERT INTO buku (kategori, judul, tahun, penerbit, jumlah, status, kode) VALUES (?,?,?,?,?,?,?)";
+
+            // prepare statement
+            PreparedStatement stmt = this.conn.prepareStatement(query);
+
+            // replace ? with value;
+            stmt.setString(1, data.kategori);
+            stmt.setString(2, data.judul);
+            stmt.setInt(3, data.tahun);
+            stmt.setString(4, data.penerbit);
+            stmt.setInt(5, data.jumlah);
+            stmt.setString(6, data.status);
+            stmt.setString(7, data.kode);
+
+            int rowAffected = stmt.executeUpdate();
+
+            return rowAffected > 0;
+
+        } catch (SQLException ex) {
+            Logger.getLogger(BukuModel.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+
+    }
+
     public void injectRow(DefaultTableModel defaultTableModel, ResultSet data) {
         try {
             while (data.next()) {
