@@ -20,6 +20,12 @@ public class DataBuku extends javax.swing.JFrame {
     final BukuModel bukuModel = new BukuModel();
     DefaultTableModel defaultTableModel;
 
+    public void clearRow() {
+        if (defaultTableModel.getRowCount() != 0) {
+            defaultTableModel.setRowCount(0);
+        }
+    }
+
     private void initData() {
         searchAlert.setText("");
 
@@ -27,16 +33,15 @@ public class DataBuku extends javax.swing.JFrame {
         ResultSet data = this.bukuModel.findAll();
         defaultTableModel = (DefaultTableModel) tabelBuku.getModel();
 
-        // inject row
+        // clear data first
+        clearRow();
+
+        // then inject row
         this.bukuModel.injectRow(defaultTableModel, data);
     }
 
     private void searchTableAction() {
         try {
-            // remove all row for replacing new Data
-            if (defaultTableModel.getRowCount() != 0) {
-                defaultTableModel.setRowCount(0);
-            }
 
             searchAlert.setText("");
 
@@ -51,13 +56,16 @@ public class DataBuku extends javax.swing.JFrame {
             // search and fetch data
             ResultSet data = this.bukuModel.searchBy(selectedValue, searchBuku.getText());
 
+            // clear data first
+            clearRow();
+
             // if data doesn't exist
             if (!data.isBeforeFirst()) {
                 searchAlert.setText("Data tidak ada!");
                 return;
             }
 
-            // inject row with new data
+            // then inject row with new data
             this.bukuModel.injectRow(defaultTableModel, data);
 
         } catch (SQLException ex) {
@@ -65,11 +73,49 @@ public class DataBuku extends javax.swing.JFrame {
         }
     }
 
+    public void addSelectedRowToinput(BukuModel data) {
+        kategoriBuku.setText(data.kategori);
+        judulBuku.setText(data.judul);
+        tahunBuku.setText(data.tahun + "");
+        penerbitBuku.setText(data.penerbit);
+        jumlahBuku.setText(data.jumlah + "");
+        kodeBuku.setText(data.kode);
+    }
+
+    public BukuModel grabInputForm() {
+        DataBukuAlert.setText("");
+
+        // check if form is null
+        if (kategoriBuku.getText().equals("") || judulBuku.getText().equals("")
+                && tahunBuku.getText().equals("") || penerbitBuku.getText().equals("")
+                && jumlahBuku.getText().equals("") || kodeBuku.getText().equals("")) {
+
+            DataBukuAlert.setText("Data form kosong");
+            return null;
+        }
+
+        // check if statusBuku is default
+        if ("---".equals(statusBuku.getSelectedItem().toString())) {
+            return null;
+        }
+
+        // grab all input user
+        this.bukuModel.kategori = kategoriBuku.getText();
+        this.bukuModel.judul = judulBuku.getText();
+        this.bukuModel.tahun = Integer.parseInt(tahunBuku.getText());
+        this.bukuModel.penerbit = penerbitBuku.getText();
+        this.bukuModel.jumlah = Integer.parseInt(jumlahBuku.getText());
+        this.bukuModel.status = statusBuku.getSelectedItem().toString();
+        this.bukuModel.kode = kodeBuku.getText();
+
+        return this.bukuModel;
+    }
+
     public void initLayout() {
         // hide button
-        btnSimpan.setVisible(false);
-        btnUbah.setVisible(false);
-        btnHapus.setVisible(false);
+        btnSimpan.setEnabled(false);
+        btnUbah.setEnabled(false);
+        btnHapus.setEnabled(false);
 
         // adjust table size
         tabelBuku.setRowHeight(25);
@@ -90,8 +136,6 @@ public class DataBuku extends javax.swing.JFrame {
         initComponents();
         initData();
         initLayout();
-
-        System.out.printf("Before -> %s, %s, %d, %s", this.bukuModel.kategori, this.bukuModel.judul, this.bukuModel.tahun, this.bukuModel.penerbit);
 
     }
 
@@ -165,41 +209,21 @@ public class DataBuku extends javax.swing.JFrame {
 
         judulBuku.setFont(new java.awt.Font("Cantarell", 0, 20)); // NOI18N
         judulBuku.setMargin(new java.awt.Insets(2, 15, 2, 15));
-        judulBuku.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                judulBukuActionPerformed(evt);
-            }
-        });
 
         jLabel3.setFont(new java.awt.Font("Cantarell", 0, 20)); // NOI18N
         jLabel3.setText("Judul");
 
         kategoriBuku.setFont(new java.awt.Font("Cantarell", 0, 20)); // NOI18N
         kategoriBuku.setMargin(new java.awt.Insets(2, 15, 2, 15));
-        kategoriBuku.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                kategoriBukuActionPerformed(evt);
-            }
-        });
 
         penerbitBuku.setFont(new java.awt.Font("Cantarell", 0, 20)); // NOI18N
         penerbitBuku.setMargin(new java.awt.Insets(2, 15, 2, 15));
-        penerbitBuku.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                penerbitBukuActionPerformed(evt);
-            }
-        });
 
         jLabel4.setFont(new java.awt.Font("Cantarell", 0, 20)); // NOI18N
         jLabel4.setText("Penerbit");
 
         tahunBuku.setFont(new java.awt.Font("Cantarell", 0, 20)); // NOI18N
         tahunBuku.setMargin(new java.awt.Insets(2, 15, 2, 15));
-        tahunBuku.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tahunBukuActionPerformed(evt);
-            }
-        });
         tahunBuku.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 tahunBukuKeyTyped(evt);
@@ -211,11 +235,6 @@ public class DataBuku extends javax.swing.JFrame {
 
         jumlahBuku.setFont(new java.awt.Font("Cantarell", 0, 20)); // NOI18N
         jumlahBuku.setMargin(new java.awt.Insets(2, 15, 2, 15));
-        jumlahBuku.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jumlahBukuActionPerformed(evt);
-            }
-        });
         jumlahBuku.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 jumlahBukuKeyTyped(evt);
@@ -224,11 +243,6 @@ public class DataBuku extends javax.swing.JFrame {
 
         kodeBuku.setFont(new java.awt.Font("Cantarell", 0, 20)); // NOI18N
         kodeBuku.setMargin(new java.awt.Insets(2, 15, 2, 15));
-        kodeBuku.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                kodeBukuActionPerformed(evt);
-            }
-        });
         kodeBuku.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 kodeBukuKeyTyped(evt);
@@ -245,7 +259,7 @@ public class DataBuku extends javax.swing.JFrame {
         jLabel9.setText("Jumlah");
 
         statusBuku.setFont(new java.awt.Font("Cantarell", 0, 20)); // NOI18N
-        statusBuku.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Tersedia", "Kosong", "Dipinjam" }));
+        statusBuku.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "---", "Tersedia", "Kosong", "Dipinjam" }));
         statusBuku.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 statusBukuActionPerformed(evt);
@@ -304,7 +318,7 @@ public class DataBuku extends javax.swing.JFrame {
         jLabel11.setText("Data Buku");
 
         cmbSearchBuku.setFont(new java.awt.Font("Cantarell", 0, 20)); // NOI18N
-        cmbSearchBuku.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "kategori", "judul", "penerbit", "status" }));
+        cmbSearchBuku.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "judul", "kategori", "penerbit", "status" }));
         cmbSearchBuku.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cmbSearchBukuActionPerformed(evt);
@@ -344,11 +358,17 @@ public class DataBuku extends javax.swing.JFrame {
                 return types [columnIndex];
             }
         });
+        tabelBuku.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                tabelBukuMouseReleased(evt);
+            }
+        });
         jScrollPane1.setViewportView(tabelBuku);
 
         searchAlert.setFont(new java.awt.Font("Cantarell", 0, 25)); // NOI18N
         searchAlert.setForeground(new java.awt.Color(255, 0, 0));
 
+        DataBukuAlert.setFont(new java.awt.Font("Cantarell", 0, 23)); // NOI18N
         DataBukuAlert.setForeground(new java.awt.Color(255, 0, 0));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -475,54 +495,32 @@ public class DataBuku extends javax.swing.JFrame {
                     .addComponent(cmbSearchBuku, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(searchBuku, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 308, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(326, 326, 326))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 620, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(14, 14, 14))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void judulBukuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_judulBukuActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_judulBukuActionPerformed
-
-    private void kategoriBukuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_kategoriBukuActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_kategoriBukuActionPerformed
-
-    private void penerbitBukuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_penerbitBukuActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_penerbitBukuActionPerformed
-
-    private void tahunBukuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tahunBukuActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tahunBukuActionPerformed
-
-    private void jumlahBukuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jumlahBukuActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jumlahBukuActionPerformed
-
-    private void kodeBukuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_kodeBukuActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_kodeBukuActionPerformed
-
     private void btnTambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTambahActionPerformed
 
-        if (kategoriBuku.get) {
+        BukuModel data = grabInputForm();
+
+        if (data == null) {
+            return;
         }
 
-        // grab all input user
-        this.bukuModel.kategori = kategoriBuku.getText();
-        this.bukuModel.judul = judulBuku.getText();
-        this.bukuModel.tahun = Integer.parseInt(tahunBuku.getText());
-        this.bukuModel.penerbit = penerbitBuku.getText();
-        this.bukuModel.jumlah = Integer.parseInt(jumlahBuku.getText());
-        this.bukuModel.status = statusBuku.getSelectedItem().toString();
-        this.bukuModel.kode = kodeBuku.getText();
+        // insert buku
+        boolean isSuccess = this.bukuModel.insertRow(data);
 
-        boolean isSuccess = this.bukuModel.insertBuku(this.bukuModel);
-
+        // success
         if (isSuccess) {
+            kategoriBuku.setText("");
+            judulBuku.setText("");
+            tahunBuku.setText("");
+            penerbitBuku.setText("");
+            jumlahBuku.setText("");
+            kodeBuku.setText("");
 
             initData();
             return;
@@ -533,11 +531,45 @@ public class DataBuku extends javax.swing.JFrame {
     }//GEN-LAST:event_btnTambahActionPerformed
 
     private void btnSimpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSimpanActionPerformed
-        // TODO add your handling code here:
+        BukuModel data = grabInputForm();
+
+        if (data == null) {
+            return;
+        }
+
+        // emable button
+        btnTambah.setEnabled(true);
+
+        // edit row via model
+        int rowAffected = this.bukuModel.editRow(data);
+
+        // is success
+        if (rowAffected > 0) {
+            JOptionPane.showMessageDialog(null, "Sukses mengubah data");
+            initData();
+            return;
+        }
+        JOptionPane.showMessageDialog(null, "Gagal mengubah data");
     }//GEN-LAST:event_btnSimpanActionPerformed
 
     private void btnUbahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUbahActionPerformed
-        // TODO add your handling code here:
+        // disable button
+        btnUbah.setEnabled(false);
+
+        // place data to input
+        int row = tabelBuku.getSelectedRow();
+        this.bukuModel.kategori = tabelBuku.getModel().getValueAt(row, 0).toString();
+        this.bukuModel.judul = tabelBuku.getModel().getValueAt(row, 1).toString();
+        this.bukuModel.tahun = Integer.parseInt(tabelBuku.getModel().getValueAt(row, 2).toString());
+        this.bukuModel.penerbit = tabelBuku.getModel().getValueAt(row, 3).toString();
+        this.bukuModel.jumlah = Integer.parseInt(tabelBuku.getModel().getValueAt(row, 4).toString());
+        this.bukuModel.status = tabelBuku.getModel().getValueAt(row, 5).toString();
+        this.bukuModel.kode = tabelBuku.getModel().getValueAt(row, 6).toString();
+
+        // enable simpan
+        btnSimpan.setEnabled(true);
+
+        addSelectedRowToinput(this.bukuModel);
     }//GEN-LAST:event_btnUbahActionPerformed
 
     private void btnHapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHapusActionPerformed
@@ -545,16 +577,17 @@ public class DataBuku extends javax.swing.JFrame {
     }//GEN-LAST:event_btnHapusActionPerformed
 
     private void btnKeluarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnKeluarActionPerformed
-        // TODO add your handling code here:
+        int isLogout = JOptionPane.showConfirmDialog(null, "Anda akan keluar?");
+
+        if (isLogout == 0) {
+            this.setVisible(false);
+            new Login().setVisible(true);
+        }
     }//GEN-LAST:event_btnKeluarActionPerformed
 
     private void searchBukuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchBukuActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_searchBukuActionPerformed
-
-    private void statusBukuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statusBukuActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_statusBukuActionPerformed
 
     private void cmbSearchBukuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbSearchBukuActionPerformed
         this.searchTableAction();
@@ -593,6 +626,16 @@ public class DataBuku extends javax.swing.JFrame {
             evt.consume();
         }
     }//GEN-LAST:event_kodeBukuKeyTyped
+
+    private void tabelBukuMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabelBukuMouseReleased
+        btnUbah.setEnabled(true);
+        btnSimpan.setEnabled(false);
+//        btnTambah.setEnabled(false);
+    }//GEN-LAST:event_tabelBukuMouseReleased
+
+    private void statusBukuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statusBukuActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_statusBukuActionPerformed
 
     /**
      * @param args the command line arguments

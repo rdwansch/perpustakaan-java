@@ -27,6 +27,7 @@ public class BukuModel extends Model {
 
     public BukuModel() {
         TABLE = "buku";
+
     }
 
     public ResultSet searchBy(String field, String value) {
@@ -49,15 +50,15 @@ public class BukuModel extends Model {
         }
     }
 
-    public boolean insertBuku(BukuModel data) {
+    public boolean insertRow(BukuModel data) {
         try {
             // query SQL
-            String query = "INSERT INTO buku (kategori, judul, tahun, penerbit, jumlah, status, kode) VALUES (?,?,?,?,?,?,?)";
+            String query = "INSERT INTO buku (id, judul, tahun, penerbit, jumlah, status, kode) VALUES (?,?,?,?,?,?,?)";
 
             // prepare statement
             PreparedStatement stmt = this.conn.prepareStatement(query);
 
-            // replace ? with value;
+            // replace ? with value
             stmt.setString(1, data.kategori);
             stmt.setString(2, data.judul);
             stmt.setInt(3, data.tahun);
@@ -74,7 +75,28 @@ public class BukuModel extends Model {
             Logger.getLogger(BukuModel.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
+    }
 
+    public int editRow(BukuModel data) {
+        try {
+            // query SQL
+            String query = "UPDATE buku SET kategori = ?, judul = ?, tahun = ?, penerbit = ?, jumlah = ?, status = ?, kode = ? WHERE id = ?";
+
+            // prepare statement
+            PreparedStatement stmt = this.conn.prepareStatement(query);
+            stmt.setString(1, data.kategori);
+            stmt.setString(2, data.judul);
+            stmt.setInt(3, data.tahun);
+            stmt.setString(1, data.penerbit);
+            stmt.setInt(1, data.jumlah);
+            stmt.setString(1, data.status);
+            stmt.setString(1, data.kode);
+
+            return stmt.executeUpdate();
+
+        } catch (SQLException ex) {
+            Logger.getLogger(BukuModel.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public void injectRow(DefaultTableModel defaultTableModel, ResultSet data) {

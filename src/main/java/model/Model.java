@@ -30,7 +30,8 @@ public class Model {
         try {
             this.conn = DriverManager.getConnection(this.DB_URL + "?user=" + this.USER + "&password=" + this.PASS);
         } catch (SQLException e) {
-            System.out.println("<-- Error connect DB -> " + e);
+            System.err.println("Error connect DB -> " + e);
+            System.exit(-1);
         }
     }
 
@@ -43,7 +44,6 @@ public class Model {
             JOptionPane.showMessageDialog(null, "Error query: " + exception.getMessage());
             return null;
         }
-
     }
 
     public ResultSet findWhere(String field, String value) throws SQLException {
