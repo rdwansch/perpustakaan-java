@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -24,10 +25,10 @@ public class BukuModel extends Model {
     public int jumlah;
     public String status;
     public String kode;
+    private int id;
 
     public BukuModel() {
         TABLE = "buku";
-
     }
 
     public ResultSet searchBy(String field, String value) {
@@ -42,9 +43,9 @@ public class BukuModel extends Model {
             stmt.setString(1, "%" + value + "%");
 
             return stmt.executeQuery();
-
         } catch (SQLException ex) {
             Logger.getLogger(BukuModel.class.getName()).log(Level.SEVERE, null, ex);
+            System.exit(-1);
             return null;
 
         }
@@ -52,11 +53,23 @@ public class BukuModel extends Model {
 
     public boolean insertRow(BukuModel data) {
         try {
+            String query = "SELECT * FROM buku WHERE kode = ?";
+            PreparedStatement stmt = this.conn.prepareStatement(query);
+
+            stmt.setString(1, data.kode);
+
+            ResultSet buku = stmt.executeQuery();
+
+            if (buku.isBeforeFirst()) {
+                JOptionPane.showMessageDialog(null, "Data sudah ada");
+                return false;
+            }
+
             // query SQL
-            String query = "INSERT INTO buku (id, judul, tahun, penerbit, jumlah, status, kode) VALUES (?,?,?,?,?,?,?)";
+            query = "INSERT INTO buku (kategori, judul, tahun, penerbit, jumlah, status, kode) VALUES (?,?,?,?,?,?,?)";
 
             // prepare statement
-            PreparedStatement stmt = this.conn.prepareStatement(query);
+            stmt = this.conn.prepareStatement(query);
 
             // replace ? with value
             stmt.setString(1, data.kategori);
@@ -80,22 +93,28 @@ public class BukuModel extends Model {
     public int editRow(BukuModel data) {
         try {
             // query SQL
-            String query = "UPDATE buku SET kategori = ?, judul = ?, tahun = ?, penerbit = ?, jumlah = ?, status = ?, kode = ? WHERE id = ?";
+            String query = "UPDATE buku SET kategori = ?, judul = ?, tahun = ?, penerbit = ?, jumlah = ?, status = ?, kode = ? WHERE kode = ?";
 
             // prepare statement
             PreparedStatement stmt = this.conn.prepareStatement(query);
             stmt.setString(1, data.kategori);
             stmt.setString(2, data.judul);
             stmt.setInt(3, data.tahun);
-            stmt.setString(1, data.penerbit);
-            stmt.setInt(1, data.jumlah);
-            stmt.setString(1, data.status);
-            stmt.setString(1, data.kode);
+            stmt.setString(4, data.penerbit);
+            stmt.setInt(5, data.jumlah);
+            stmt.setString(6, data.status);
+            stmt.setString(7, data.kode);
+            stmt.setString(8, data.kode);
 
-            return stmt.executeUpdate();
+            int res = stmt.executeUpdate();
+
+            this.conn.commit();
+
+            return res;
 
         } catch (SQLException ex) {
             Logger.getLogger(BukuModel.class.getName()).log(Level.SEVERE, null, ex);
+            return 0;
         }
     }
 
@@ -114,6 +133,19 @@ public class BukuModel extends Model {
             }
         } catch (SQLException ex) {
             Logger.getLogger(BukuModel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public int deleteRow(String kode) {
+        try {
+            String query = "DELETE FROM buku WHERE kode = ?";
+            PreparedStatement stmt = this.conn.prepareStatement(query);
+            stmt.setString(1, kode);
+
+            return stmt.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(BukuModel.class.getName()).log(Level.SEVERE, null, ex);
+            return 0;
         }
     }
 }

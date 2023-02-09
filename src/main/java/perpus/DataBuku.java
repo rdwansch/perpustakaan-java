@@ -82,6 +82,18 @@ public class DataBuku extends javax.swing.JFrame {
         kodeBuku.setText(data.kode);
     }
 
+    public void getSelectedRow() {
+        // place data to input
+        int row = tabelBuku.getSelectedRow();
+        this.bukuModel.kategori = tabelBuku.getModel().getValueAt(row, 0).toString();
+        this.bukuModel.judul = tabelBuku.getModel().getValueAt(row, 1).toString();
+        this.bukuModel.tahun = Integer.parseInt(tabelBuku.getModel().getValueAt(row, 2).toString());
+        this.bukuModel.penerbit = tabelBuku.getModel().getValueAt(row, 3).toString();
+        this.bukuModel.jumlah = Integer.parseInt(tabelBuku.getModel().getValueAt(row, 4).toString());
+        this.bukuModel.status = tabelBuku.getModel().getValueAt(row, 5).toString();
+        this.bukuModel.kode = tabelBuku.getModel().getValueAt(row, 6).toString();
+    }
+
     public BukuModel grabInputForm() {
         DataBukuAlert.setText("");
 
@@ -534,38 +546,36 @@ public class DataBuku extends javax.swing.JFrame {
         BukuModel data = grabInputForm();
 
         if (data == null) {
+            DataBukuAlert.setText("Data Kosong");
             return;
         }
 
         // emable button
         btnTambah.setEnabled(true);
 
+        System.out.println("data ->" + data);
+
         // edit row via model
         int rowAffected = this.bukuModel.editRow(data);
+
+        System.out.println("rowAffected " + rowAffected);
 
         // is success
         if (rowAffected > 0) {
             JOptionPane.showMessageDialog(null, "Sukses mengubah data");
             initData();
+            clearRow();
             return;
         }
         JOptionPane.showMessageDialog(null, "Gagal mengubah data");
+
     }//GEN-LAST:event_btnSimpanActionPerformed
 
     private void btnUbahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUbahActionPerformed
         // disable button
         btnUbah.setEnabled(false);
 
-        // place data to input
-        int row = tabelBuku.getSelectedRow();
-        this.bukuModel.kategori = tabelBuku.getModel().getValueAt(row, 0).toString();
-        this.bukuModel.judul = tabelBuku.getModel().getValueAt(row, 1).toString();
-        this.bukuModel.tahun = Integer.parseInt(tabelBuku.getModel().getValueAt(row, 2).toString());
-        this.bukuModel.penerbit = tabelBuku.getModel().getValueAt(row, 3).toString();
-        this.bukuModel.jumlah = Integer.parseInt(tabelBuku.getModel().getValueAt(row, 4).toString());
-        this.bukuModel.status = tabelBuku.getModel().getValueAt(row, 5).toString();
-        this.bukuModel.kode = tabelBuku.getModel().getValueAt(row, 6).toString();
-
+        getSelectedRow();
         // enable simpan
         btnSimpan.setEnabled(true);
 
@@ -573,7 +583,21 @@ public class DataBuku extends javax.swing.JFrame {
     }//GEN-LAST:event_btnUbahActionPerformed
 
     private void btnHapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHapusActionPerformed
-        // TODO add your handling code here:
+        int confirm = JOptionPane.showConfirmDialog(null, "Data Buku Akan di Hapus?");
+
+        if (confirm == 0) {
+            getSelectedRow();
+            int rowAffected = this.bukuModel.deleteRow(this.bukuModel.kode);
+
+            if (rowAffected > 0) {
+                JOptionPane.showMessageDialog(null, "Sukses dihapus");
+                initData();
+                return;
+            }
+
+            JOptionPane.showMessageDialog(null, "Gagal dihapus");
+        }
+
     }//GEN-LAST:event_btnHapusActionPerformed
 
     private void btnKeluarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnKeluarActionPerformed
@@ -630,7 +654,7 @@ public class DataBuku extends javax.swing.JFrame {
     private void tabelBukuMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabelBukuMouseReleased
         btnUbah.setEnabled(true);
         btnSimpan.setEnabled(false);
-//        btnTambah.setEnabled(false);
+        btnHapus.setEnabled(true);
     }//GEN-LAST:event_tabelBukuMouseReleased
 
     private void statusBukuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statusBukuActionPerformed

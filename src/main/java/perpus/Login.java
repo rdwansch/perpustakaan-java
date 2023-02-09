@@ -4,7 +4,6 @@
  */
 package perpus;
 
-import javax.swing.JOptionPane;
 import model.UserModel;
 
 /**
@@ -174,8 +173,6 @@ public class Login extends javax.swing.JFrame {
             loginAlert.setText("username atau password SALAH!");
             return;
         }
-        // show success dialog
-        JOptionPane.showMessageDialog(null, "Anda berhasil Login");
 
         // Change page to DataBuku
         this.setVisible(false);
