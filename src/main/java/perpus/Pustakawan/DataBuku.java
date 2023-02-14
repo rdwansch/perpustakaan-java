@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package perpus;
+package perpus.Pustakawan;
 
 import java.sql.*;
 import java.util.logging.Level;
@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import model.BukuModel;
+import perpus.Login;
 
 /**
  *
@@ -85,13 +86,12 @@ public class DataBuku extends javax.swing.JFrame {
     public void getSelectedRow() {
         // place data to input
         int row = tabelBuku.getSelectedRow();
-        this.bukuModel.kategori = tabelBuku.getModel().getValueAt(row, 0).toString();
-        this.bukuModel.judul = tabelBuku.getModel().getValueAt(row, 1).toString();
-        this.bukuModel.tahun = Integer.parseInt(tabelBuku.getModel().getValueAt(row, 2).toString());
-        this.bukuModel.penerbit = tabelBuku.getModel().getValueAt(row, 3).toString();
-        this.bukuModel.jumlah = Integer.parseInt(tabelBuku.getModel().getValueAt(row, 4).toString());
-        this.bukuModel.status = tabelBuku.getModel().getValueAt(row, 5).toString();
-        this.bukuModel.kode = tabelBuku.getModel().getValueAt(row, 6).toString();
+        this.bukuModel.kategori = tabelBuku.getModel().getValueAt(row, 1).toString();
+        this.bukuModel.judul = tabelBuku.getModel().getValueAt(row, 2).toString();
+        this.bukuModel.tahun = Integer.parseInt(tabelBuku.getModel().getValueAt(row, 3).toString());
+        this.bukuModel.penerbit = tabelBuku.getModel().getValueAt(row, 4).toString();
+        this.bukuModel.jumlah = Integer.parseInt(tabelBuku.getModel().getValueAt(row, 5).toString());
+        this.bukuModel.kode = tabelBuku.getModel().getValueAt(row, 7).toString();
     }
 
     public BukuModel grabInputForm() {
@@ -106,21 +106,24 @@ public class DataBuku extends javax.swing.JFrame {
             return null;
         }
 
-        // check if statusBuku is default
-        if ("---".equals(statusBuku.getSelectedItem().toString())) {
-            return null;
-        }
-
         // grab all input user
         this.bukuModel.kategori = kategoriBuku.getText();
         this.bukuModel.judul = judulBuku.getText();
         this.bukuModel.tahun = Integer.parseInt(tahunBuku.getText());
         this.bukuModel.penerbit = penerbitBuku.getText();
         this.bukuModel.jumlah = Integer.parseInt(jumlahBuku.getText());
-        this.bukuModel.status = statusBuku.getSelectedItem().toString();
         this.bukuModel.kode = kodeBuku.getText();
 
         return this.bukuModel;
+    }
+
+    public void clearInputForm() {
+        kategoriBuku.setText("");
+        judulBuku.setText("");
+        tahunBuku.setText("");
+        penerbitBuku.setText("");
+        jumlahBuku.setText("");
+        kodeBuku.setText("");
     }
 
     public void initLayout() {
@@ -131,14 +134,14 @@ public class DataBuku extends javax.swing.JFrame {
 
         // adjust table size
         tabelBuku.setRowHeight(25);
-        tabelBuku.getColumnModel().getColumn(0).setPreferredWidth(130);
-        tabelBuku.getColumnModel().getColumn(1).setPreferredWidth(230);
-        tabelBuku.getColumnModel().getColumn(2).setPreferredWidth(1);
-        tabelBuku.getColumnModel().getColumn(3).setPreferredWidth(100);
-        tabelBuku.getColumnModel().getColumn(4).setPreferredWidth(1);
-        tabelBuku.getColumnModel().getColumn(5).setPreferredWidth(40);
+        tabelBuku.getColumnModel().getColumn(0).setPreferredWidth(1);
+        tabelBuku.getColumnModel().getColumn(1).setPreferredWidth(130);
+        tabelBuku.getColumnModel().getColumn(2).setPreferredWidth(230);
+        tabelBuku.getColumnModel().getColumn(3).setPreferredWidth(1);
+        tabelBuku.getColumnModel().getColumn(4).setPreferredWidth(100);
+        tabelBuku.getColumnModel().getColumn(5).setPreferredWidth(1);
         tabelBuku.getColumnModel().getColumn(6).setPreferredWidth(40);
-
+        tabelBuku.getColumnModel().getColumn(7).setPreferredWidth(40);
     }
 
     /**
@@ -173,9 +176,7 @@ public class DataBuku extends javax.swing.JFrame {
         jumlahBuku = new javax.swing.JTextField();
         kodeBuku = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
-        statusBuku = new javax.swing.JComboBox<>();
         btnTambah = new javax.swing.JButton();
         btnSimpan = new javax.swing.JButton();
         btnUbah = new javax.swing.JButton();
@@ -264,19 +265,8 @@ public class DataBuku extends javax.swing.JFrame {
         jLabel7.setFont(new java.awt.Font("Cantarell", 0, 20)); // NOI18N
         jLabel7.setText("Kode");
 
-        jLabel8.setFont(new java.awt.Font("Cantarell", 0, 20)); // NOI18N
-        jLabel8.setText("Status");
-
         jLabel9.setFont(new java.awt.Font("Cantarell", 0, 20)); // NOI18N
         jLabel9.setText("Jumlah");
-
-        statusBuku.setFont(new java.awt.Font("Cantarell", 0, 20)); // NOI18N
-        statusBuku.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "---", "Tersedia", "Kosong", "Dipinjam" }));
-        statusBuku.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                statusBukuActionPerformed(evt);
-            }
-        });
 
         btnTambah.setBackground(new java.awt.Color(244, 218, 254));
         btnTambah.setFont(new java.awt.Font("Cantarell", 0, 20)); // NOI18N
@@ -330,7 +320,7 @@ public class DataBuku extends javax.swing.JFrame {
         jLabel11.setText("Data Buku");
 
         cmbSearchBuku.setFont(new java.awt.Font("Cantarell", 0, 20)); // NOI18N
-        cmbSearchBuku.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "judul", "kategori", "penerbit", "status" }));
+        cmbSearchBuku.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "judul", "kategori", "penerbit", "kode" }));
         cmbSearchBuku.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cmbSearchBukuActionPerformed(evt);
@@ -359,17 +349,9 @@ public class DataBuku extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Kategori", "Judul", "Tahun", "Penerbit", "Jumlah", "Status", "Kode"
+                "No", "Kategori", "Judul", "Tahun", "Penerbit", "Jumlah", "Status", "Kode"
             }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Object.class, java.lang.Object.class, java.lang.Integer.class, java.lang.Object.class
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-        });
+        ));
         tabelBuku.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
                 tabelBukuMouseReleased(evt);
@@ -410,9 +392,9 @@ public class DataBuku extends javax.swing.JFrame {
                                         .addComponent(btnTambah, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addGap(91, 91, 91)
                                         .addComponent(btnSimpan, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 77, Short.MAX_VALUE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(btnUbah, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 121, Short.MAX_VALUE))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                     .addGroup(layout.createSequentialGroup()
                                         .addComponent(DataBukuAlert)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
@@ -438,13 +420,11 @@ public class DataBuku extends javax.swing.JFrame {
                                     .addComponent(penerbitBuku, javax.swing.GroupLayout.PREFERRED_SIZE, 308, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(41, 41, 41)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel8)
                                     .addComponent(jLabel9)
                                     .addComponent(jLabel7))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(statusBuku, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 314, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(kodeBuku, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 314, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addGap(136, 136, 136)
+                                .addComponent(kodeBuku, javax.swing.GroupLayout.PREFERRED_SIZE, 314, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE)))
                         .addGap(62, 62, 62))))
         );
         layout.setVerticalGroup(
@@ -460,19 +440,13 @@ public class DataBuku extends javax.swing.JFrame {
                         .addContainerGap()
                         .addComponent(DataBukuAlert)
                         .addGap(18, 18, 18)))
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(jumlahBuku, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel8)
-                            .addComponent(statusBuku, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(kodeBuku, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel7))
-                        .addGap(61, 61, 61))
-                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(kodeBuku, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel2)
                             .addComponent(kategoriBuku, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -480,7 +454,8 @@ public class DataBuku extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(judulBuku, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel3))
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel7))
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel5)
@@ -488,15 +463,15 @@ public class DataBuku extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(penerbitBuku, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel4))))
-                .addGap(26, 26, 26)
+                            .addComponent(jLabel4))
+                        .addGap(26, 26, 26)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnTambah, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnSimpan, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnUbah, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnHapus, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnKeluar, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(41, 41, 41)
+                .addGap(29, 29, 29)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -563,8 +538,10 @@ public class DataBuku extends javax.swing.JFrame {
         // is success
         if (rowAffected > 0) {
             JOptionPane.showMessageDialog(null, "Sukses mengubah data");
-            initData();
+            btnSimpan.setEnabled(false);
             clearRow();
+            clearInputForm();
+            initData();
             return;
         }
         JOptionPane.showMessageDialog(null, "Gagal mengubah data");
@@ -591,6 +568,7 @@ public class DataBuku extends javax.swing.JFrame {
 
             if (rowAffected > 0) {
                 JOptionPane.showMessageDialog(null, "Sukses dihapus");
+                clearInputForm();
                 initData();
                 return;
             }
@@ -657,10 +635,6 @@ public class DataBuku extends javax.swing.JFrame {
         btnHapus.setEnabled(true);
     }//GEN-LAST:event_tabelBukuMouseReleased
 
-    private void statusBukuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statusBukuActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_statusBukuActionPerformed
-
     /**
      * @param args the command line arguments
      */
@@ -721,7 +695,6 @@ public class DataBuku extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
@@ -733,7 +706,6 @@ public class DataBuku extends javax.swing.JFrame {
     private javax.swing.JTextField penerbitBuku;
     private javax.swing.JLabel searchAlert;
     private javax.swing.JTextField searchBuku;
-    private javax.swing.JComboBox<String> statusBuku;
     private javax.swing.JTable tabelBuku;
     private javax.swing.JTextField tahunBuku;
     // End of variables declaration//GEN-END:variables
