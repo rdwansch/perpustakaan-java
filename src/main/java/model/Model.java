@@ -46,6 +46,17 @@ public class Model {
         }
     }
 
+    public ResultSet findAll(String field, String data) {
+        String query = "SELECT * FROM " + this.TABLE + " WHERE " + field + " = '" + data + "' ORDER BY id DESC";
+
+        try {
+            return this.conn.createStatement().executeQuery(query);
+        } catch (SQLException exception) {
+            JOptionPane.showMessageDialog(null, "Error query: " + exception.getMessage());
+            return null;
+        }
+    }
+
     public ResultSet findWhere(String field, String value) throws SQLException {
         // query SQL
         String query = String.format("SELECT * FROM %s WHERE %s = ?", this.TABLE, field);

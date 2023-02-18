@@ -6,6 +6,7 @@ package perpus;
 
 import perpus.Pustakawan.DataBuku;
 import model.UserModel;
+import perpus.Admin.*;
 
 /**
  *
@@ -169,7 +170,7 @@ public class Login extends javax.swing.JFrame {
         // query to database
         boolean isSuccess = userModel.findWithUsernameAndPassword(username.getText(), password.getText());
 
-        // check if user exist
+        // check if user found with matched username and passowrd
         if (isSuccess == false) {
             loginAlert.setText("username atau password SALAH!");
             return;
@@ -177,7 +178,11 @@ public class Login extends javax.swing.JFrame {
 
         // Change page to DataBuku
         this.setVisible(false);
-        new DataBuku().setVisible(true);
+        if (userModel.role.equals("admin")) {
+            new DataPustakawan().setVisible(true);
+        } else if (userModel.role.equals("pustakawan")) {
+            new DataBuku().setVisible(true);
+        }
     }//GEN-LAST:event_btnMasukActionPerformed
 
     /**
