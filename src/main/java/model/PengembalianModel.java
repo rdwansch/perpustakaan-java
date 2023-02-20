@@ -20,17 +20,16 @@ public class PengembalianModel extends Model {
 
     public int id;
     public int id_user;
-    public int durasi;
     public String nama;
     public String judul;
     public Date tanggal_pinjam;
+    public Date tanggal_kembali;
+    public int denda;
     public String status;
-    public String kode;
-    public int jumlah_buku;
 
     public ResultSet findAll() {
         try {
-            String query = "SELECT p.id, u.nama, b.judul, p.durasi, p.tanggal_pinjam, p.status, p.jumlah_buku, b.kode FROM peminjaman AS p"
+            String query = "SELECT p.id, u.nama, b.judul, p.tanggal_pinjam, p.tanggal_kembali, p.denda, p.status FROM pengembalian AS p"
                     + " INNER JOIN buku AS b ON p.id_buku = b.id "
                     + " INNER JOIN user AS u ON p.id_user = u.id";
             return conn.createStatement().executeQuery(query);
@@ -43,12 +42,13 @@ public class PengembalianModel extends Model {
     public int editRow(PengembalianModel data) {
         try {
             // query SQL
-            String query = "UPDATE peminjaman SET status = ? WHERE id = ?";
+            String query = "UPDATE pengembalian SET status = ?, denda = ? WHERE id = ?";
 
             // prepare statement
             PreparedStatement stmt = this.conn.prepareStatement(query);
             stmt.setString(1, data.status);
-            stmt.setInt(2, data.id);
+            stmt.setInt(2, data.denda);
+            stmt.setInt(3, data.id);
 
             return stmt.executeUpdate();
 
@@ -61,7 +61,7 @@ public class PengembalianModel extends Model {
     public int deleteRow(int id) {
         try {
             // query SQL
-            String query = "DELETE FROM peminjaman WHERE id = ?";
+            String query = "DELETE FROM pengembalian WHERE id = ?";
 
             // prepare statement
             PreparedStatement stmt = this.conn.prepareStatement(query);
@@ -81,10 +81,9 @@ public class PengembalianModel extends Model {
                     data.getString("id"),
                     data.getString("nama"),
                     data.getString("judul"),
-                    data.getString("durasi"),
                     data.getString("tanggal_pinjam"),
-                    data.getString("jumlah_buku"),
-                    data.getString("kode"),
+                    data.getString("tanggal_kembali"),
+                    data.getString("denda"),
                     data.getString("status")
                 });
             }
